@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Star - Mainframe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0B0F19; color: #F8FAFC; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen w-full flex flex-col justify-between">
+
+    <header class="w-full bg-[#161B26]/80 backdrop-blur-md border-b border-gray-800/60 sticky top-0 px-8 py-4 flex items-center justify-between z-50">
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#38BDF8" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.151-.312.596-.312.748 0l2.401 4.881 5.376.78c.346.05.482.472.232.716l-3.89 3.793.918 5.352c.059.344-.302.607-.609.445L12 14c-.297.163-.658-.1-.599-.445l.918-5.352-3.89-3.793c-.25-.244-.114-.666.232-.716l5.376-.78 2.401-4.88z" />
+            </svg>
+            <span class="text-lg font-bold tracking-widest uppercase">Morning Star</span>
+        </div>
+        
+        <div class="hidden md:flex bg-[#0B0F19] border border-gray-800 rounded-full px-5 py-2 w-96 items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#94A3B8" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.603 10.601Z" />
+            </svg>
+            <input type="text" placeholder="Search authenticated keys..." class="bg-transparent border-none outline-none text-xs w-full text-slate-300">
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs text-[#94A3B8]">Authorized User</p>
+                <p class="text-sm font-semibold text-white">{{ current_user }}</p>
+            </div>
+            <a href="/logout" class="bg-gray-800 hover:bg-rose-950 text-gray-300 hover:text-rose-400 p-2.5 rounded-xl transition duration-200 border border-gray-700/50" title="Revoke Session Token">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-8">
+        <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-2xl font-extrabold tracking-tight">Mainframe Directory</h2>
+                <p class="text-sm text-[#94A3B8]">Secure nodes matching valid 128-dimensional biometric signatures.</p>
+            </div>
+            
+            <div class="bg-[#161B26] border border-gray-800 rounded-lg px-4 py-2 text-xs font-mono flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                System Integrity: Secure
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for user in users %}
+            <div class="bg-[#161B26] border border-gray-800/80 hover:border-sky-500/40 p-4 rounded-2xl group transition-all duration-200 hover:-translate-y-1 shadow-lg flex flex-col justify-between aspect-square">
+                <div class="flex justify-between items-start">
+                    <div class="p-3 bg-[#0B0F19] rounded-xl text-[#38BDF8] border border-gray-800 group-hover:border-sky-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                        </svg>
+                    </div>
+                    {% if user == current_user %}
+                    <span class="text-[10px] font-bold tracking-widest uppercase bg-sky-500/10 text-[#38BDF8] px-2.5 py-1 rounded-full border border-sky-400/20">
+                        Active Node
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-white tracking-wide truncate group-hover:text-[#38BDF8] transition-colors">
+                        {{ user }}
+                    </h3>
+                    <p class="text-[11px] font-mono text-[#94A3B8] mt-1">Matrix Identity verified</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer class="w-full text-center py-6 border-t border-gray-900 text-xs text-gray-600">
+        &copy; 2026 Morning Star Security Core. Heavily encrypted.
+    </footer>
+
+</body>
+</html>

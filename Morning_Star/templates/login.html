@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Star - Gatekeeper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0B0F19; color: #F8FAFC; font-family: 'Inter', sans-serif; }
+        .scanner-ring::before {
+            content: ''; position: absolute; inset: -4px; border: 2px dashed #38BDF8;
+            border-radius: 24px; animation: spin 20s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .toast { transform: translateY(100px); transition: all 0.4s ease; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md text-center">
+        <div class="inline-flex items-center gap-2 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#38BDF8" class="w-7 h-7">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.151-.312.596-.312.748 0l2.401 4.881 5.376.78c.346.05.482.472.232.716l-3.89 3.793.918 5.352c.059.344-.302.607-.609.445L12 14c-.297.163-.658-.1-.599-.445l.918-5.352-3.89-3.793c-.25-.244-.114-.666.232-.716l5.376-.78 2.401-4.88z" />
+            </svg>
+            <span class="text-sm font-bold tracking-widest uppercase text-gray-400">Morning Star Auth</span>
+        </div>
+
+        <h1 class="text-2xl font-bold mb-1">Face Recognition Gateway</h1>
+        <p id="funny-prompt" class="text-sm text-[#94A3B8] mb-8">Stare deeply into the lens. No blinking, human.</p>
+
+        <div class="relative w-72 h-72 mx-auto mb-8 scanner-ring flex items-center justify-center bg-[#161B26] rounded-2xl p-2 border border-gray-800">
+            <video id="video" class="w-full h-full object-cover rounded-xl" autoplay></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            
+            <div class="absolute inset-x-4 top-1/2 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-bounce"></div>
+        </div>
+
+        <a href="/signup" class="text-xs font-semibold text-[#38BDF8] hover:underline flex items-center justify-center gap-1">
+            Don't have a security key? Create profile
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+        </a>
+    </div>
+
+    <div id="toast" class="toast opacity-0 fixed bottom-6 bg-slate-800 text-slate-200 text-xs font-mono px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-gray-700">
+        <span>🤖 Status:</span> <span id="toast-message">Initializing matrix...</span>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const promptText = document.getElementById('funny-prompt');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-message');
+
+        const sassRemarks = [
+            "Analyzing facial architecture... impressive symmetry.",
+            "Processing vectors. Please refrain from making funny sounds.",
+            "Searching the mainframe. Are you sure you registered?",
+            "Still checking... Is that your real smile?",
+            "Hold steady! Computing complex deep-learning layers."
+        ];
+
+        navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 400 } })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { updateStatus("Camera failure. Operational breakdown."); });
+
+        function updateStatus(msg) {
+            toast.classList.add('show');
+            toastMsg.innerText = msg;
+        }
+
+        // Auto capture-verify sequence loops continuously
+        const authInterval = setInterval(() => {
+            // Cycle comedic feedback phrases randomly
+            promptText.innerText = sassRemarks[Math.floor(Math.random() * sassRemarks.length)];
+
+            canvas.width = 400; canvas.height = 400;
+            context.drawImage(video, 0, 0, 400, 400);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updateStatus("Access Granted! Welcome back.");
+                    clearInterval(authInterval);
+                    setTimeout(() => window.location.href = data.redirect, 1200);
+                } else if (data.message.includes("No face")) {
+                    updateStatus("Identity missing. Is anyone sitting there?");
+                } else {
+                    updateStatus("Intruder alert! Face doesn't match our database.");
+                }
+            });
+        }, 2200);
+    </script>
+</body>
+</html>
